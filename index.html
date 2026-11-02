@@ -250,6 +250,7 @@
 
   <!-- JavaScript Application Logic -->
   <script>
+    // Embedded Working Google Apps Script Webhook Endpoint
     const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyCYB0dUcQ6i-bUhthLG5IvHws6gZUDOvZDr33ThtyPyX24x-ewm4bAA2rBnytVT0x0/exec";
 
     const rawQuestions = [
@@ -831,7 +832,6 @@
       document.getElementById('quiz-header-status').classList.add('hidden');
       document.getElementById('result-view').classList.remove('hidden');
 
-      // Matching keys with the Google Apps Script POST parser
       const payload = {
         studentName: studentDetails.name,
         studentId: studentDetails.id,
