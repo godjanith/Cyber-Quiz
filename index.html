@@ -457,7 +457,7 @@
           "ECB mode encrypts identical plaintext blocks into identical ciphertext blocks, preserving data patterns.",
           "X.509 is the standard ITU-T format for public key certificates.",
           "CRLs are digitally signed by the issuing CA using its private key.",
-          "A hash collision attack attempts to find two distinct inputs that yield the exact same hash output."
+          "A hash collision attack attempts to find two different inputs that yield the exact same hash output."
         ][i]
       })),
 
@@ -831,6 +831,7 @@
       document.getElementById('quiz-header-status').classList.add('hidden');
       document.getElementById('result-view').classList.remove('hidden');
 
+      // Matching keys with the Google Apps Script POST parser
       const payload = {
         studentName: studentDetails.name,
         studentId: studentDetails.id,
@@ -850,7 +851,7 @@
         await fetch(GOOGLE_SHEET_WEBHOOK_URL, {
           method: "POST",
           mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "text/plain" },
           body: JSON.stringify(payload)
         });
         statusElement.innerText = "✓ Score successfully logged in Instructor Janith VC's Google Sheet roster!";
