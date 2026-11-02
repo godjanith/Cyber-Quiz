@@ -1,0 +1,2233 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JANITH VC - Cyber Security Examination System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            800: '#115e59',
+                            900: '#134e4a',
+                            950: '#042f2e',
+                            neon: '#00f0ff',
+                            purple: '#7000ff',
+                            dark: '#0a0f1d',
+                            card: '#111827',
+                            border: '#1f2937'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+        
+        body {
+            background-color: #060913;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 240, 255, 0.05) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(112, 0, 255, 0.05) 0%, transparent 25%);
+        }
+        
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+        }
+
+        .glow-neon {
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+        }
+
+        .glow-purple {
+            box-shadow: 0 0 15px rgba(112, 0, 255, 0.25);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0f1d;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand Title -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="app.showDashboard()">
+                    <div class="p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <span class="font-mono text-xs text-cyan-400 uppercase tracking-widest block font-bold">Cyber Security Portal</span>
+                        <h1 class="text-lg font-bold text-white tracking-wide flex items-center gap-2">
+                            JANITH VC <span class="text-xs font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Exam System</span>
+                        </h1>
+                    </div>
+                </div>
+
+                <!-- Global Quiz Stats / Info -->
+                <div id="header-stats" class="hidden md:flex items-center space-x-6 text-sm">
+                    <div class="flex items-center space-x-2 text-slate-400">
+                        <i data-lucide="book-open" class="w-4 h-4 text-cyan-400"></i>
+                        <span>Subject: <strong class="text-slate-200">Cyber Security</strong></span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-slate-400">
+                        <i data-lucide="help-circle" class="w-4 h-4 text-purple-400"></i>
+                        <span>Total MCQs: <strong class="text-slate-200">90 Questions</strong></span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-slate-400">
+                        <i data-lucide="user" class="w-4 h-4 text-emerald-400"></i>
+                        <span>Instructor: <strong class="text-slate-200">JANITH VC</strong></span>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="flex items-center space-x-3">
+                    <button id="btn-resume-quiz" onclick="app.resumeSavedQuiz()" class="hidden text-xs font-mono px-3 py-1.5 rounded-lg border border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 transition flex items-center gap-1.5 animate-pulse">
+                        <i data-lucide="play-circle" class="w-4 h-4"></i>
+                        <span>Resume Saved Exam</span>
+                    </button>
+                    <button id="btn-header-action" onclick="app.showDashboard()" class="text-xs font-mono px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-1.5">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span>Dashboard</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+        <!-- VIEW 1: DASHBOARD & TOPIC SELECTION -->
+        <section id="view-dashboard" class="space-y-8">
+            <!-- Welcome Banner -->
+            <div class="relative overflow-hidden rounded-2xl glass-panel p-6 sm:p-8 border border-cyan-500/20">
+                <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-3xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-mono mb-4">
+                        <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                        Official Examination Engine &bull; Instructor: JANITH VC
+                    </div>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mb-3">
+                        Cyber Security Assessment Center
+                    </h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
+                        Welcome students! Select a topic below to practice 30 domain-specific MCQs or take the Comprehensive 90-Question Master Test. Click options for instant verification and detailed engineering reasons.
+                    </p>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
+                        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+                            <span class="text-slate-500 block">Total Topics</span>
+                            <span class="text-lg font-bold text-cyan-400">3 Modules</span>
+                        </div>
+                        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+                            <span class="text-slate-500 block">Question Bank</span>
+                            <span class="text-lg font-bold text-purple-400">90 MCQs</span>
+                        </div>
+                        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+                            <span class="text-slate-500 block">Pass Threshold</span>
+                            <span class="text-lg font-bold text-emerald-400">70% Score</span>
+                        </div>
+                        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+                            <span class="text-slate-500 block">Explanations</span>
+                            <span class="text-lg font-bold text-amber-400">Instant</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Topic Cards -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="layers" class="w-5 h-5 text-cyan-400"></i>
+                        Select Examination Topic
+                    </h3>
+                    <span class="text-xs font-mono text-slate-400">Instructor: JANITH VC</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Topic 1 -->
+                    <div class="glass-card rounded-xl p-6 flex flex-col justify-between relative group">
+                        <div class="space-y-4">
+                            <div class="w-12 h-12 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                                <i data-lucide="wifi" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-mono text-cyan-400 uppercase tracking-wider">Module 1</span>
+                                <h4 class="text-lg font-bold text-white mt-1">Network Security & Firewalls</h4>
+                                <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                                    Firewalls, IDS/IPS, VPNs, OSI model security, TCP/IP attacks, packet filtering, and network isolation techniques.
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-4 text-xs font-mono text-slate-400 border-t border-slate-800/80 pt-3">
+                                <span><strong class="text-slate-200">30</strong> MCQs</span>
+                                <span>&bull;</span>
+                                <span><strong class="text-slate-200">30</strong> Mins</span>
+                            </div>
+                        </div>
+                        <button onclick="app.startQuiz(1)" class="mt-6 w-full py-2.5 px-4 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-sm transition duration-150 flex items-center justify-center gap-2">
+                            <span>Start Module 1</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Topic 2 -->
+                    <div class="glass-card rounded-xl p-6 flex flex-col justify-between relative group">
+                        <div class="space-y-4">
+                            <div class="w-12 h-12 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                                <i data-lucide="key" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-mono text-purple-400 uppercase tracking-wider">Module 2</span>
+                                <h4 class="text-lg font-bold text-white mt-1">Cryptography & PKI</h4>
+                                <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                                    Symmetric/Asymmetric encryption, AES, RSA, SHA hashing, digital signatures, PKI certificates, and key exchange.
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-4 text-xs font-mono text-slate-400 border-t border-slate-800/80 pt-3">
+                                <span><strong class="text-slate-200">30</strong> MCQs</span>
+                                <span>&bull;</span>
+                                <span><strong class="text-slate-200">30</strong> Mins</span>
+                            </div>
+                        </div>
+                        <button onclick="app.startQuiz(2)" class="mt-6 w-full py-2.5 px-4 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold text-sm transition duration-150 flex items-center justify-center gap-2">
+                            <span>Start Module 2</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Topic 3 -->
+                    <div class="glass-card rounded-xl p-6 flex flex-col justify-between relative group">
+                        <div class="space-y-4">
+                            <div class="w-12 h-12 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                                <i data-lucide="globe" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-mono text-emerald-400 uppercase tracking-wider">Module 3</span>
+                                <h4 class="text-lg font-bold text-white mt-1">Web App Security & OWASP</h4>
+                                <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                                    SQL Injection, XSS, CSRF, Broken Auth, SSRF, OWASP Top 10 vulnerabilities, security headers, and sanitization.
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-4 text-xs font-mono text-slate-400 border-t border-slate-800/80 pt-3">
+                                <span><strong class="text-slate-200">30</strong> MCQs</span>
+                                <span>&bull;</span>
+                                <span><strong class="text-slate-200">30</strong> Mins</span>
+                            </div>
+                        </div>
+                        <button onclick="app.startQuiz(3)" class="mt-6 w-full py-2.5 px-4 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-sm transition duration-150 flex items-center justify-center gap-2">
+                            <span>Start Module 3</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Master Comprehensive Exam Banner -->
+                <div class="mt-6 glass-panel rounded-xl p-6 border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-slate-900 via-amber-950/20 to-slate-900">
+                    <div class="flex items-center space-x-4">
+                        <div class="p-3 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/30 shrink-0">
+                            <i data-lucide="award" class="w-8 h-8"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-mono text-amber-400 uppercase tracking-wider font-semibold">Comprehensive Exam</span>
+                            <h4 class="text-xl font-bold text-white">Full 90-Question Cyber Security Master Test</h4>
+                            <p class="text-xs text-slate-400 mt-1">Evaluates all 3 modules in a single continuous examination session curated by JANITH VC.</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                        <label class="inline-flex items-center gap-2 text-xs font-mono text-slate-300 cursor-pointer">
+                            <input type="checkbox" id="chk-shuffle" class="rounded bg-slate-900 border-slate-700 text-cyan-500 focus:ring-cyan-500">
+                            <span>Shuffle Questions</span>
+                        </label>
+                        <button onclick="app.startQuiz(0)" class="w-full md:w-auto px-6 py-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition shrink-0 flex items-center justify-center gap-2">
+                            <i data-lucide="zap" class="w-4 h-4"></i>
+                            <span>Start 90-Question Exam</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: INTERACTIVE QUIZ INTERFACE -->
+        <section id="view-quiz" class="hidden space-y-6">
+            <!-- Quiz Meta Header bar -->
+            <div class="glass-panel p-4 rounded-xl flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <button onclick="app.confirmExit()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="Exit Exam">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    </button>
+                    <div>
+                        <span id="quiz-topic-badge" class="text-xs font-mono text-cyan-400 uppercase">Module 1</span>
+                        <h3 id="quiz-topic-title" class="text-base font-bold text-white">Network Security & Firewalls</h3>
+                    </div>
+                </div>
+
+                <!-- Timer & Navigation Controls -->
+                <div class="flex items-center space-x-4">
+                    <button onclick="app.toggleQuestionGrid()" class="text-xs font-mono px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 transition flex items-center gap-1.5">
+                        <i data-lucide="grid" class="w-4 h-4 text-cyan-400"></i>
+                        <span>Question Palette</span>
+                    </button>
+
+                    <div class="flex items-center space-x-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800 font-mono text-sm">
+                        <i data-lucide="clock" class="w-4 h-4 text-cyan-400 animate-pulse"></i>
+                        <span id="quiz-timer" class="text-cyan-300 font-bold">30:00</span>
+                    </div>
+
+                    <div class="text-right">
+                        <span class="text-xs font-mono text-slate-400 block">Question Progress</span>
+                        <span class="text-sm font-bold text-slate-200 font-mono" id="quiz-progress-text">1 / 30</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Palette Drawer Grid -->
+            <div id="question-palette-drawer" class="hidden glass-panel p-4 rounded-xl border border-cyan-500/20 space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <span class="text-xs font-mono text-slate-300 font-bold">Question Palette (Jump to question)</span>
+                    <span class="text-xs text-slate-400 font-mono"><span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1"></span>Answered &bull; <span class="inline-block w-2.5 h-2.5 rounded-full bg-slate-700 mr-1 ml-2"></span>Unanswered</span>
+                </div>
+                <div id="question-grid-container" class="grid grid-cols-6 sm:grid-cols-10 md:grid-cols-15 gap-2 max-h-48 overflow-y-auto p-1">
+                    <!-- Dynamic Question Buttons -->
+                </div>
+            </div>
+
+            <!-- Overall Progress Bar -->
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div id="quiz-progress-bar" class="bg-gradient-to-r from-cyan-500 to-purple-500 h-full w-0 transition-all duration-300"></div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="glass-panel rounded-xl p-6 sm:p-8 space-y-6">
+                <!-- Question Text -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span id="question-number-tag" class="text-xs font-mono px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">Question #1</span>
+                        <span id="question-category-tag" class="text-xs font-mono text-slate-400">Network Security</span>
+                    </div>
+                    <h2 id="question-text" class="text-lg sm:text-xl font-semibold text-white leading-relaxed pt-2">
+                        Loading question content...
+                    </h2>
+                </div>
+
+                <!-- Options Grid -->
+                <div id="options-container" class="grid grid-cols-1 gap-3 pt-2">
+                    <!-- Dynamic option buttons inserted here -->
+                </div>
+
+                <!-- Instant Feedback / Reason Explanation Panel -->
+                <div id="explanation-box" class="hidden rounded-xl p-5 border transition-all duration-300">
+                    <div class="flex items-start space-x-3">
+                        <div id="explanation-icon" class="p-2 rounded-lg shrink-0 mt-0.5">
+                            <!-- Icon inserted dynamically -->
+                        </div>
+                        <div class="space-y-1">
+                            <h4 id="explanation-status" class="font-bold text-sm tracking-wide">Explanation</h4>
+                            <p id="explanation-text" class="text-sm text-slate-300 leading-relaxed font-sans">
+                                Detailed reason explanation will appear here.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Navigation Buttons -->
+                <div class="flex items-center justify-between pt-4 border-t border-slate-800/80">
+                    <button id="btn-prev" onclick="app.prevQuestion()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm border border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1.5">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        <span>Previous</span>
+                    </button>
+
+                    <div class="flex items-center space-x-3">
+                        <button id="btn-next" onclick="app.nextQuestion()" class="px-5 py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm transition flex items-center gap-1.5">
+                            <span>Next Question</span>
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                        <button id="btn-submit-exam" onclick="app.finishQuiz()" class="hidden px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition flex items-center gap-1.5">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                            <span>Submit Exam</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: SCORE SUMMARY & REVIEW DASHBOARD -->
+        <section id="view-results" class="hidden space-y-8">
+            <!-- Score Overview Card -->
+            <div class="glass-panel rounded-2xl p-6 sm:p-8 border border-slate-800 text-center relative overflow-hidden">
+                <div class="max-w-2xl mx-auto space-y-4">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-mono border border-slate-700">
+                        <i data-lucide="award" class="w-3.5 h-3.5 text-amber-400"></i>
+                        Official Exam Result &bull; Instructor: JANITH VC
+                    </div>
+
+                    <h2 class="text-3xl font-extrabold text-white">Examination Completed</h2>
+
+                    <!-- Final Percentage Circle / Display -->
+                    <div class="py-4 flex justify-center">
+                        <div class="w-36 h-36 rounded-full border-4 border-cyan-500/40 bg-slate-900/90 flex flex-col items-center justify-center shadow-xl glow-neon">
+                            <span id="results-percentage" class="text-4xl font-extrabold text-cyan-400 font-mono">0%</span>
+                            <span id="results-grade" class="text-xs font-mono text-slate-400 uppercase tracking-widest mt-1">GRADE F</span>
+                        </div>
+                    </div>
+
+                    <p id="results-feedback" class="text-slate-300 text-sm leading-relaxed">
+                        Feedback calculation in progress...
+                    </p>
+
+                    <!-- Stat Chips -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-left pt-4">
+                        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+                            <span class="text-xs text-slate-400 block font-mono">Correct Answers</span>
+                            <span id="results-score-text" class="text-lg font-bold text-emerald-400 font-mono">0 / 30</span>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+                            <span class="text-xs text-slate-400 block font-mono">Accuracy</span>
+                            <span id="results-accuracy-text" class="text-lg font-bold text-cyan-400 font-mono">0%</span>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+                            <span class="text-xs text-slate-400 block font-mono">Time Spent</span>
+                            <span id="results-time-text" class="text-lg font-bold text-purple-400 font-mono">00:00</span>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+                            <span class="text-xs text-slate-400 block font-mono">Status</span>
+                            <span id="results-status-badge" class="text-lg font-bold text-amber-400 font-mono">PASSED</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap items-center justify-center gap-4 pt-4">
+                        <button onclick="app.showDashboard()" class="px-5 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm border border-slate-700 transition flex items-center gap-2">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                            <span>Return to Dashboard</span>
+                        </button>
+                        <button onclick="app.scrollToReview()" class="px-5 py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm transition flex items-center gap-2">
+                            <i data-lucide="eye" class="w-4 h-4"></i>
+                            <span>Review All Questions & Explanations</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review Section -->
+            <div id="review-section" class="space-y-6 pt-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i data-lucide="file-search" class="w-5 h-5 text-cyan-400"></i>
+                            Detailed Answers Review
+                        </h3>
+                        <p class="text-xs text-slate-400">Verify your selected options alongside correct answers and instructor explanations.</p>
+                    </div>
+
+                    <!-- Filter buttons for Review -->
+                    <div class="flex items-center space-x-2 text-xs font-mono">
+                        <button onclick="app.filterReview('all')" id="btn-filter-all" class="px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-bold transition">All</button>
+                        <button onclick="app.filterReview('incorrect')" id="btn-filter-incorrect" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">Incorrect Only</button>
+                        <button onclick="app.filterReview('correct')" id="btn-filter-correct" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">Correct Only</button>
+                    </div>
+                </div>
+
+                <!-- Container for Review Cards -->
+                <div id="review-cards-container" class="space-y-4">
+                    <!-- Dynamic review items generated here -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Banner -->
+    <footer class="border-t border-slate-800/80 bg-slate-950/80 py-6 text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <i data-lucide="shield" class="w-4 h-4 text-cyan-400"></i>
+                <span>Cyber Security Online Examination &bull; Designed by <strong>Instructor JANITH VC</strong></span>
+            </div>
+            <p class="text-slate-400 font-mono">
+                Classroom Quiz Engine &bull; All 90 Questions Active
+            </p>
+        </div>
+    </footer>
+
+    <!-- Application Script -->
+    <script>
+        // --- COMPLETE 90 QUESTIONS DATASET (3 TOPICS x 30 MCQs) ---
+        const QUESTIONS_DB = [
+            // ==========================================
+            // TOPIC 1: Network Security & Firewalls (30 Qs)
+            // ==========================================
+            {
+                id: 1,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "Which type of firewall inspects traffic based on active connection state and context in the state table?",
+                options: [
+                    "Packet-filtering firewall",
+                    "Stateful inspection firewall",
+                    "Stateless packet filter",
+                    "Circuit-level gateway"
+                ],
+                correct: 1,
+                explanation: "Stateful inspection firewalls keep track of the state of active network connections (such as TCP handshakes) and use this context to evaluate incoming and outgoing traffic, making them more secure than basic stateless filters."
+            },
+            {
+                id: 2,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "What is the primary operational difference between an IDS and an IPS?",
+                options: [
+                    "IDS blocks traffic inline; IPS only logs alerts",
+                    "IDS passively monitors and alerts; IPS actively blocks detected threats inline",
+                    "IDS operates at Layer 7; IPS operates strictly at Layer 2",
+                    "IDS encrypts data streams; IPS decrypts them"
+                ],
+                correct: 1,
+                explanation: "An Intrusion Detection System (IDS) acts passively to monitor network traffic and trigger alerts, whereas an Intrusion Prevention System (IPS) is placed inline to actively block or drop malicious traffic in real time."
+            },
+            {
+                id: 3,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "In a SYN Flood attack, which resource on the victim target machine is primarily exhausted?",
+                options: [
+                    "Disk Storage space",
+                    "TCP Connection backlog queue memory",
+                    "DNS Cache memory",
+                    "GPU render buffers"
+                ],
+                correct: 1,
+                explanation: "A SYN Flood attack sends a flood of TCP SYN packets with spoofed source addresses. The victim allocates memory for half-open connections in its TCP connection backlog queue until the queue is exhausted and legitimate connections are refused."
+            },
+            {
+                id: 4,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "Which protocol provides encrypted transport for remote terminal sessions as a secure replacement for Telnet?",
+                options: [
+                    "SNMPv3",
+                    "SSH (Secure Shell)",
+                    "FTP",
+                    "HTTP/2"
+                ],
+                correct: 1,
+                explanation: "SSH (Secure Shell) uses strong cryptography to encrypt all traffic (including authentication credentials) between client and server, replacing insecure legacy protocols like Telnet."
+            },
+            {
+                id: 5,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "What is the primary function of a Demilitarized Zone (DMZ) in network design?",
+                options: [
+                    "To store internal user passwords securely",
+                    "To isolate public-facing services from the sensitive internal corporate network",
+                    "To speed up Wi-Fi signal propagation",
+                    "To eliminate the need for network firewalls"
+                ],
+                correct: 1,
+                explanation: "A DMZ is a physical or logical subnet that separates an internal network from untrusted external networks (like the Internet). Public services like Web or Mail servers are placed in the DMZ so a compromise there does not instantly expose the internal LAN."
+            },
+            {
+                id: 6,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "Which mechanism protects against ARP poisoning attacks on a local switched network?",
+                options: [
+                    "Dynamic ARP Inspection (DAI)",
+                    "BPDU Guard",
+                    "DNSSEC",
+                    "BGP Route Reflectors"
+                ],
+                correct: 0,
+                explanation: "Dynamic ARP Inspection (DAI) is a switch security feature that validates ARP packets on a network, discarding invalid or spoofed ARP bindings based on a trusted DHCP snooping database."
+            },
+            {
+                id: 7,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "At which OSI model layer does a Next-Generation Firewall (NGFW) perform Deep Packet Inspection (DPI)?",
+                options: [
+                    "Layer 2 (Data Link)",
+                    "Layer 3 (Network)",
+                    "Layer 4 (Transport)",
+                    "Layer 7 (Application)"
+                ],
+                correct: 3,
+                explanation: "Next-Generation Firewalls (NGFWs) inspect payload contents and identify specific application protocols (like Skype, WhatsApp, or SQL traffic) at Layer 7 (Application Layer)."
+            },
+            {
+                id: 8,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "What type of attack involves sending crafted ICMP echo requests to a broadcast IP address with a spoofed victim source address?",
+                options: [
+                    "Smurf Attack",
+                    "Ping of Death",
+                    "Teardrop Attack",
+                    "Man-in-the-Middle"
+                ],
+                correct: 0,
+                explanation: "A Smurf Attack amplifies traffic by sending ICMP Echo requests to network broadcast addresses while spoofing the victim's IP address, causing all host responses to flood the victim."
+            },
+            {
+                id: 9,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "Which IPsec protocol provides both data confidentiality (encryption) and data origin authentication?",
+                options: [
+                    "AH (Authentication Header)",
+                    "ESP (Encapsulating Security Payload)",
+                    "IKEv1 Main Mode",
+                    "L2TP"
+                ],
+                correct: 1,
+                explanation: "IPsec ESP (Encapsulating Security Payload) provides encryption for data confidentiality, as well as authentication and integrity protection. In contrast, AH only provides authentication without encryption."
+            },
+            {
+                id: 10,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "What is the default port number used by HTTPS traffic secured via SSL/TLS?",
+                options: [
+                    "Port 80",
+                    "Port 8080",
+                    "Port 443",
+                    "Port 22"
+                ],
+                correct: 2,
+                explanation: "Port 443 is the standard port reserved for secure HTTP traffic (HTTPS) encapsulated within TLS/SSL."
+            },
+            {
+                id: 11,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "Which wireless security protocol introduces Simultaneous Authentication of Equals (SAE) to eliminate offline dictionary attacks?",
+                options: [
+                    "WEP",
+                    "WPA",
+                    "WPA2-PSK",
+                    "WPA3"
+                ],
+                correct: 3,
+                explanation: "WPA3 replaces the Pre-Shared Key (PSK) exchange with Simultaneous Authentication of Equals (SAE), preventing attackers from capturing handshakes to perform offline dictionary/brute-force attacks."
+            },
+            {
+                id: 12,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "What does Network Address Translation (NAT) masquerading primarily achieve for internal hosts?",
+                options: [
+                    "Protects data against cryptographic cryptanalysis",
+                    "Hides private internal IPv4 addresses behind a single public IP address",
+                    "Guarantees zero-latency routing",
+                    "Enforces 802.1X port authentication"
+                ],
+                correct: 1,
+                explanation: "NAT (specifically NAPT / Masquerading) maps multiple private internal IP addresses (RFC 1918) to a single public IP address, obfuscating internal network topology from external observers."
+            },
+            {
+                id: 13,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "Which attack manipulates DNS resolvers to return fake IP addresses for a legitimate domain name?",
+                options: [
+                    "DNS Spoofing / Cache Poisoning",
+                    "DNS Amplification",
+                    "Domain Hijacking",
+                    "BGP Hijacking"
+                ],
+                correct: 0,
+                explanation: "DNS Cache Poisoning inserts fraudulent IP address mappings into a recursive DNS resolver's cache, redirecting users to malicious clone sites without their knowledge."
+            },
+            {
+                id: 14,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "What is the main function of Virtual Local Area Networks (VLANs) in network security?",
+                options: [
+                    "Accelerate Wi-Fi authentication speeds",
+                    "Logically segment broadcast domains and isolate network traffic",
+                    "Automatically compress raw network packets",
+                    "Provide physical wire armor for network cabling"
+                ],
+                correct: 1,
+                explanation: "VLANs divide a physical network switch into separate logical broadcast domains, ensuring hosts in different VLANs cannot communicate directly without going through a router/firewall policy."
+            },
+            {
+                id: 15,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "Which type of VPN operates at the OSI Application layer using standard web browsers without requiring client software installations?",
+                options: [
+                    "IPsec VPN in Transport Mode",
+                    "SSL/TLS Web VPN",
+                    "GRE Tunnel",
+                    "PPTP VPN"
+                ],
+                correct: 1,
+                explanation: "SSL/TLS Web VPNs allow users to establish secure remote access sessions directly through a standard web browser without installing specialized client software."
+            },
+            {
+                id: 16,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "Which command-line tool is widely used for network discovery, port scanning, and vulnerability detection?",
+                options: [
+                    "Nmap",
+                    "Wireshark",
+                    "Metasploit",
+                    "John the Ripper"
+                ],
+                correct: 0,
+                explanation: "Nmap (Network Mapper) is an open-source tool used for discovering hosts, open ports, OS fingerprinting, and running security scripts across target networks."
+            },
+            {
+                id: 17,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "What is a 'bastion host' in network security infrastructure?",
+                options: [
+                    "A hardened server specifically designed to withstand attacks, situated on a public boundary",
+                    "A rogue access point planted by attackers",
+                    "A backup router used only during power outages",
+                    "An unpatched Windows XP host used as a honeypot"
+                ],
+                correct: 0,
+                explanation: "A bastion host is a system deliberately exposed to an untrusted environment (like the internet), heavily hardened by removing unnecessary services and accounts to withstand attacks."
+            },
+            {
+                id: 18,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "Which attack exploits fragmented IP packets with overlapping offsets to crash victim operating systems?",
+                options: [
+                    "Teardrop Attack",
+                    "SYN Flood",
+                    "Slowloris",
+                    "Replay Attack"
+                ],
+                correct: 0,
+                explanation: "The Teardrop attack sends mangled IP fragments with overlapping offset fields. When the target machine attempts to reassemble these fragments, an OS buffer overflow or crash occurs."
+            },
+            {
+                id: 19,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "What feature prevents unauthorized network switches from becoming the Spanning Tree Protocol (STP) root bridge?",
+                options: [
+                    "BPDU Guard / Root Guard",
+                    "Port Security",
+                    "DHCP Snooping",
+                    "Storm Control"
+                ],
+                correct: 0,
+                explanation: "STP Root Guard ensures that a switch port will not accept STP BPDU messages that attempt to claim root bridge status, preventing rogue switch insertion from altering network topology."
+            },
+            {
+                id: 20,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "Which AAA framework protocol uses TCP port 49 and separates Authentication, Authorization, and Accounting into distinct functions?",
+                options: [
+                    "RADIUS",
+                    "TACACS+",
+                    "Diameter",
+                    "LDAP"
+                ],
+                correct: 1,
+                explanation: "TACACS+ is a Cisco-developed AAA protocol that uses TCP port 49 and encrypts the entire packet payload while maintaining strictly separated Authentication, Authorization, and Accounting processes."
+            },
+            {
+                id: 21,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "What is the purpose of a Honeypot in defensive cyber operations?",
+                options: [
+                    "To speed up internal DNS resolution",
+                    "To decoy attackers away from critical assets and gather intelligence on attack techniques",
+                    "To block all outgoing traffic from corporate laptops",
+                    "To generate fake SSL certificates"
+                ],
+                correct: 1,
+                explanation: "A Honeypot is a trap system designed to look like a vulnerable production target. It entices attackers, diverts them from real systems, and allows security teams to study their tactics."
+            },
+            {
+                id: 22,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "Which metric does a network administrator analyze in Wireshark to detect an active ARP Spoofing attack?",
+                options: [
+                    "Duplicate IP addresses bound to different MAC addresses in short timeframes",
+                    "Excessive TLS handshake alerts",
+                    "High frequency of HTTP 404 errors",
+                    "UDP port 53 timeout messages"
+                ],
+                correct: 0,
+                explanation: "ARP spoofing causes multiple gratuitous ARP replies mapping a single legitimate IP address (like the default gateway) to the attacker's MAC address."
+            },
+            {
+                id: 23,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "Which firewall rule policy is considered best practice under the principle of Least Privilege?",
+                options: [
+                    "Implicit Allow (Allow everything unless explicitly denied)",
+                    "Implicit Deny (Deny all traffic by default, allow only explicitly permitted rules)",
+                    "Random Packet Dropping",
+                    "Permit all outbound ICMP traffic without logging"
+                ],
+                correct: 1,
+                explanation: "Implicit Deny (or default deny) ensures that all network traffic is blocked at the end of the rule base unless explicit permission rules are matched above it."
+            },
+            {
+                id: 24,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "What is the function of Port Security on an Ethernet switch?",
+                options: [
+                    "Encrypts physical copper cable signals",
+                    "Restricts switch port access based on authorized device MAC addresses",
+                    "Limits bandwidth consumption per VLAN",
+                    "Translates internal IPv4 addresses to IPv6"
+                ],
+                correct: 1,
+                explanation: "Port Security allows administrators to bind specific MAC addresses to a physical switch port and define violation actions (such as shutting down the port) if unauthorized devices connect."
+            },
+            {
+                id: 25,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "Which attack sends slow, incomplete HTTP requests to keep web server worker threads occupied indefinitely?",
+                options: [
+                    "Slowloris",
+                    "Ping of Death",
+                    "SYN Flood",
+                    "UDP Amplification"
+                ],
+                correct: 0,
+                explanation: "Slowloris opens multiple connections to a target web server and sends partial HTTP headers periodically, holding connections open until all server threads are exhausted."
+            },
+            {
+                id: 26,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "What is the primary role of an egress filter on an enterprise border firewall?",
+                options: [
+                    "To prevent unauthorized or malicious outbound traffic from leaving the internal network",
+                    "To block incoming port scans from external IP addresses",
+                    "To balance incoming user sessions across web servers",
+                    "To generate automatic SSL root certificates"
+                ],
+                correct: 0,
+                explanation: "Egress filtering inspects and restricts outgoing traffic, preventing compromised internal systems from communicating with attacker Command & Control (C2) servers or exfiltrating data."
+            },
+            {
+                id: 27,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "Which protocol secures DNS traffic by attaching cryptographic signatures to DNS records?",
+                options: [
+                    "DNSSEC",
+                    "DoH (DNS over HTTPS)",
+                    "DoT (DNS over TLS)",
+                    "mDNS"
+                ],
+                correct: 0,
+                explanation: "DNSSEC (DNS Security Extensions) uses public-key cryptography to digitally sign DNS responses, ensuring data authenticity and preventing DNS cache poisoning."
+            },
+            {
+                id: 28,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "What is a 'Zero Trust' network architecture paradigm?",
+                options: [
+                    "Trusting all internal LAN traffic while blocking external WAN traffic",
+                    "Never trust, always verify every access request regardless of origin or location",
+                    "Using only open-source firewalls",
+                    "Eliminating all passwords in favor of IP whitelist rules"
+                ],
+                correct: 1,
+                explanation: "Zero Trust removes implicit trust based on network location. Every user, device, and application request must be authenticated, authorized, and continuously validated."
+            },
+            {
+                id: 29,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "Which attack type leverages open NTP or Memcached UDP servers to flood a victim with large response payloads?",
+                options: [
+                    "UDP Amplification DDoS Attack",
+                    "ARP Poisoning",
+                    "Man-in-the-Browser",
+                    "Session Hijacking"
+                ],
+                correct: 0,
+                explanation: "UDP Amplification attacks send requests with spoofed victim source IPs to vulnerable servers (NTP, Memcached) that return responses many times larger than the request payload."
+            },
+            {
+                id: 30,
+                topicId: 1,
+                topicName: "Network Security & Firewalls",
+                question: "What is the main security advantage of using SSH keys over password-based authentication?",
+                options: [
+                    "Keys are immune to brute-force attacks and cannot be sniffed in transit",
+                    "Keys bypass firewall restriction rules",
+                    "Keys do not require private keys on the client device",
+                    "Keys expire automatically every 10 minutes"
+                ],
+                correct: 0,
+                explanation: "Public-key authentication in SSH uses high-entropy key pairs (e.g., Ed25519 or RSA-4096) that are virtually immune to brute-force guessing and are never transmitted over the network."
+            },
+
+            // ==========================================
+            // TOPIC 2: Cryptography & PKI (30 Qs)
+            // ==========================================
+            {
+                id: 31,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "What is the key difference between symmetric and asymmetric cryptography?",
+                options: [
+                    "Symmetric uses one shared key; Asymmetric uses a mathematically linked public/private key pair",
+                    "Symmetric is slower than Asymmetric cryptography",
+                    "Asymmetric uses the same key for encryption and decryption",
+                    "Symmetric relies on quantum key distribution exclusively"
+                ],
+                correct: 0,
+                explanation: "Symmetric encryption uses a single secret key for both encryption and decryption, whereas Asymmetric encryption uses a public key to encrypt and a private key to decrypt."
+            },
+            {
+                id: 32,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "Which standard symmetric block cipher algorithm uses 128-bit blocks and key sizes of 128, 192, or 256 bits?",
+                options: [
+                    "DES",
+                    "AES (Advanced Encryption Standard)",
+                    "RSA",
+                    "Blowfish"
+                ],
+                correct: 1,
+                explanation: "AES (Rijndael cipher) was adopted by NIST in 2001. It processes data in 128-bit block sizes using key lengths of 128, 192, or 256 bits."
+            },
+            {
+                id: 33,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "What property of a cryptographic hash function guarantees that finding two distinct inputs yielding the exact same hash output is computationally infeasible?",
+                options: [
+                    "Pre-image resistance",
+                    "Collision resistance",
+                    "High entropy key schedule",
+                    "Reversibility"
+                ],
+                correct: 1,
+                explanation: "Collision resistance means it is practically impossible to find two different inputs x and y such that Hash(x) = Hash(y)."
+            },
+            {
+                id: 34,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "What cryptographic primitive does Diffie-Hellman algorithm perform?",
+                options: [
+                    "Bulk file payload encryption",
+                    "Digital Signature generation",
+                    "Secure key exchange over an untrusted channel",
+                    "Password hashing with salt"
+                ],
+                correct: 2,
+                explanation: "The Diffie-Hellman key exchange algorithm allows two parties to establish a shared secret key over an unsecure channel without sending the key itself."
+            },
+            {
+                id: 35,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "In a Public Key Infrastructure (PKI), which entity is responsible for issuing and signing digital X.509 certificates?",
+                options: [
+                    "Registration Authority (RA)",
+                    "Certificate Authority (CA)",
+                    "Key Escrow Agent",
+                    "Domain Hostmaster"
+                ],
+                correct: 1,
+                explanation: "The Certificate Authority (CA) is the trusted central entity that signs and issues X.509 digital certificates linking public keys to entity identities."
+            },
+            {
+                id: 36,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "How is non-repudiation achieved using digital signatures?",
+                options: [
+                    "The sender encrypts the message with their public key",
+                    "The sender signs a hash of the message with their private key, which anyone can verify using the sender's public key",
+                    "The receiver signs the message with a shared symmetric key",
+                    "The message is routed through three different proxies"
+                ],
+                correct: 1,
+                explanation: "Because only the sender possesses their private key, a digital signature generated with that private key proves the authenticity and origin of the message, preventing the sender from denying creation."
+            },
+            {
+                id: 37,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "Which mathematical problem forms the security basis of the RSA asymmetric algorithm?",
+                options: [
+                    "Discrete Logarithm Problem",
+                    "Integer Prime Factorization",
+                    "Elliptic Curve Point Addition",
+                    "Knapsack Subset Sum"
+                ],
+                correct: 1,
+                explanation: "RSA security relies on the practical difficulty of factoring the product of two very large prime numbers."
+            },
+            {
+                id: 38,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "What is Perfect Forward Secrecy (PFS) in TLS session key negotiation?",
+                options: [
+                    "Ensures master keys are stored on physical smartcards",
+                    "Ensures compromise of a long-term private key does not compromise past session keys",
+                    "Uses 4096-bit symmetric keys for all file transfers",
+                    "Encrypts certificate revocation lists"
+                ],
+                correct: 1,
+                explanation: "Perfect Forward Secrecy (PFS) generates ephemeral session keys per connection (e.g. using ECDHE), guaranteeing that even if the server's private key is leaked in the future, past recorded encrypted sessions cannot be decrypted."
+            },
+            {
+                id: 39,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "Which block cipher mode of operation provides both confidentiality and built-in message authentication (Authenticated Encryption)?",
+                options: [
+                    "ECB (Electronic Codebook)",
+                    "CBC (Cipher Block Chaining)",
+                    "GCM (Galois/Counter Mode)",
+                    "OFB (Output Feedback)"
+                ],
+                correct: 2,
+                explanation: "GCM (Galois/Counter Mode) is an AEAD (Authenticated Encryption with Associated Data) mode that provides high-speed encryption along with an authentication tag for integrity."
+            },
+            {
+                id: 40,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "Why is ECB (Electronic Codebook) mode strongly discouraged for encrypting images or structured payloads?",
+                options: [
+                    "It requires 2048-bit block sizes",
+                    "Identical plaintext blocks encrypt into identical ciphertext blocks, preserving data patterns",
+                    "It is computationally too slow for modern CPUs",
+                    "It cannot be decrypted without a quantum computer"
+                ],
+                correct: 1,
+                explanation: "ECB encrypts identical 64/128-bit blocks of plaintext into identical ciphertext blocks, leaving underlying structural patterns (like bitmap images) clearly visible."
+            },
+            {
+                id: 41,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "What protocol allows real-time checking of an X.509 certificate's revocation status without downloading full revocation lists?",
+                options: [
+                    "CRL (Certificate Revocation List)",
+                    "OCSP (Online Certificate Status Protocol)",
+                    "LDAP",
+                    "SCEP"
+                ],
+                correct: 1,
+                explanation: "OCSP queries a Certificate Authority's OCSP responder in real-time to check if a specific serial number certificate is valid or revoked, reducing bandwidth compared to large CRL lists."
+            },
+            {
+                id: 42,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "What is the primary purpose of adding a cryptographic 'Salt' prior to hashing user passwords?",
+                options: [
+                    "To shorten the final hash length",
+                    "To defeat precomputed Rainbow Table attacks and ensure unique hashes for identical passwords",
+                    "To make hash algorithms run 100x faster",
+                    "To allow reversible password recovery"
+                ],
+                correct: 1,
+                explanation: "A salt is a random value added to each password before hashing. This ensures identical passwords produce distinct hashes and forces attackers to generate unique lookup tables per target salt."
+            },
+            {
+                id: 43,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "Which hashing algorithm produces a fixed 256-bit output digest and belongs to the SHA-2 family?",
+                options: [
+                    "MD5",
+                    "SHA-1",
+                    "SHA-256",
+                    "BLAKE3"
+                ],
+                correct: 2,
+                explanation: "SHA-256 is part of the Secure Hash Algorithm 2 family published by NIST, producing a secure 256-bit (32-byte) message digest."
+            },
+            {
+                id: 44,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "Why is MD5 considered cryptographically broken for security applications today?",
+                options: [
+                    "It uses 512-bit keys which are outdated",
+                    "Practical collision attacks allow two different files to produce the same MD5 hash in seconds",
+                    "It can only hash text files smaller than 1MB",
+                    "NIST revoked its patent licensing"
+                ],
+                correct: 1,
+                explanation: "MD5 suffers from severe collision vulnerabilities. Researchers can easily forge two distinct documents that yield identical MD5 hashes, rendering it useless for digital signatures."
+            },
+            {
+                id: 45,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "Which key derivation function includes salt and configurable iteration counts specifically designed to slow down password brute-forcing?",
+                options: [
+                    "PBKDF2 / Argon2",
+                    "RSA-OAEP",
+                    "HMAC-SHA1",
+                    "CRC32"
+                ],
+                correct: 0,
+                explanation: "Key derivation functions like PBKDF2, bcrypt, and Argon2 deliberately apply multiple work iterations (stretching) and memory-hard requirements to neutralize GPU/ASIC password cracking."
+            },
+            {
+                id: 46,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "What is an Elliptic Curve Cryptography (ECC) key advantage over traditional RSA?",
+                options: [
+                    "ECC provides equivalent security strength using much smaller key sizes",
+                    "ECC does not require mathematical calculations",
+                    "ECC keys can be shared publicly without security loss",
+                    "ECC is immune to future quantum computing algorithms"
+                ],
+                correct: 0,
+                explanation: "ECC offers comparable security to RSA at significantly shorter key lengths (e.g. 256-bit ECC key is roughly equivalent to a 3072-bit RSA key), reducing computational load and bandwidth."
+            },
+            {
+                id: 47,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "In PKI, what file format extension typically represents PEM-encoded Base64 ASCII X.509 certificates?",
+                options: [
+                    ".pem or .crt",
+                    ".p12 or .pfx",
+                    ".exe",
+                    ".bin"
+                ],
+                correct: 0,
+                explanation: "PEM format certificates use Base64 encoding wrapped between '-----BEGIN CERTIFICATE-----' lines and commonly use .pem, .crt, or .cer file extensions."
+            },
+            {
+                id: 48,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "What component in an X.509 certificate binds the identity of the owner to their public key?",
+                options: [
+                    "The Certificate Authority's Digital Signature",
+                    "The IP routing header",
+                    "The client browser user-agent string",
+                    "The symmetric master session cookie"
+                ],
+                correct: 0,
+                explanation: "The CA's digital signature seals the X.509 certificate details (Subject name, Public Key, Validity dates), proving that the CA verified and approved the binding."
+            },
+            {
+                id: 49,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "What mechanism is used in Certificate Stapling (OCSP Stapling) to improve SSL handshake performance?",
+                options: [
+                    "The web server periodically fetches signed OCSP responses and sends them directly to clients during TLS handshakes",
+                    "Clients bypass CA validation for bookmarked sites",
+                    "Websites share a universal private key",
+                    "Browser caches certificates indefinitely"
+                ],
+                correct: 0,
+                explanation: "OCSP Stapling offloads OCSP server queries from the client by having the web server retrieve and 'staple' a time-stamped OCSP response directly inside the TLS handshake."
+            },
+            {
+                id: 50,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "Which cryptographic attack takes advantage of error messages returned by CBC decryption padding routines?",
+                options: [
+                    "Padding Oracle Attack (e.g. POODLE)",
+                    "Birthday Attack",
+                    "Replay Attack",
+                    "Length Extension Attack"
+                ],
+                correct: 0,
+                explanation: "A Padding Oracle Attack exploits side-channel information (different response errors for invalid PKCS#7 padding) to decrypt ciphertext block-by-block without knowing the key."
+            },
+            {
+                id: 51,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "What is an HMAC (Hash-based Message Authentication Code)?",
+                options: [
+                    "A construction combining a cryptographic hash function with a secret key to verify data integrity and authenticity",
+                    "An asymmetric encryption algorithm for smart cards",
+                    "A algorithm to generate TLS certificates",
+                    "A method for compressing text strings"
+                ],
+                correct: 0,
+                explanation: "HMAC mixes a secret key with the message payload through a hash function (like SHA-256), creating a digest that verifies both data integrity and message origin authenticity."
+            },
+            {
+                id: 52,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "What is the primary function of a Hardware Security Module (HSM)?",
+                options: [
+                    "To generate, store, and manage critical cryptographic keys inside tamper-resistant physical hardware",
+                    "To replace software web servers",
+                    "To scan network traffic for viruses",
+                    "To route Gigabit Ethernet packets"
+                ],
+                correct: 0,
+                explanation: "An HSM is a dedicated, physical computing device engineered to securely manage, process, and safeguard sensitive cryptographic keys against physical and logical tampering."
+            },
+            {
+                id: 53,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "Which quantum-resistant mathematical problem is a leading candidate for Post-Quantum Cryptography (PQC)?",
+                options: [
+                    "Lattice-based Cryptography",
+                    "Single DES substitution tables",
+                    "SHA-1 hash chains",
+                    "ROT13 shifting"
+                ],
+                correct: 0,
+                explanation: "Lattice-based cryptography relies on high-dimensional geometric lattice problems that remain computationally hard for both classical computers and quantum algorithms like Shor's Algorithm."
+            },
+            {
+                id: 54,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "What is a 'Root Certificate' in a public key hierarchy?",
+                options: [
+                    "A self-signed public key certificate of a Root Certificate Authority that serves as the ultimate trust anchor",
+                    "A temporary certificate issued to domain administrators",
+                    "An unencrypted SSH key file",
+                    "A certificate used exclusively for client VPN logins"
+                ],
+                correct: 0,
+                explanation: "A Root Certificate is a self-signed certificate issued by a Root CA. Operating systems and browsers maintain trusted root certificate stores to validate leaf certificates."
+            },
+            {
+                id: 55,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "Which cryptographic attack exploits mathematical probabilities in hash collisions analogous to shared birthdays in a room?",
+                options: [
+                    "Birthday Attack",
+                    "Man-in-the-Middle",
+                    "Side-Channel Attack",
+                    "Dictionary Attack"
+                ],
+                correct: 0,
+                explanation: "The Birthday Attack leverages the Birthday Paradox, showing that finding hash collisions requires significantly fewer attempts (approx 2^(n/2)) than finding a specific pre-image."
+            },
+            {
+                id: 56,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "What is Key Escrow?",
+                options: [
+                    "An arrangement where cryptographic keys are held in safety by a trusted third party for recovery purposes",
+                    "The automatic deletion of expired certificates",
+                    "The process of exchanging public keys over email",
+                    "Generating SSH keys using random mouse movements"
+                ],
+                correct: 0,
+                explanation: "Key Escrow involves depositing decryption keys with a third-party escrow agent so authorized entities can recover encrypted data under emergency or legal circumstances."
+            },
+            {
+                id: 57,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "Which stream cipher was historically used in WEP wireless encryption and SSL, but is now prohibited due to keystream biases?",
+                options: [
+                    "RC4",
+                    "AES-CTR",
+                    "ChaCha20",
+                    "3DES"
+                ],
+                correct: 0,
+                explanation: "RC4 is a legacy stream cipher that contains statistical biases in its key scheduling algorithm, enabling attackers to recover plaintexts from ciphertexts (leading to RFC 7465 prohibition)."
+            },
+            {
+                id: 58,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "What is the key size of a 3DES (Triple DES) algorithm operating in EDE3 mode?",
+                options: [
+                    "56 bits",
+                    "168 bits (112 bits effective strength)",
+                    "256 bits",
+                    "1024 bits"
+                ],
+                correct: 1,
+                explanation: "3DES in EDE3 mode applies DES three times with three distinct 56-bit keys (168 total bits), yielding an effective security strength of 112 bits against meet-in-the-middle attacks."
+            },
+            {
+                id: 59,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "What does the Certificate Transparency (CT) log framework prevent?",
+                options: [
+                    "Undetected issuance of rogue or misissued certificates by compromised CAs",
+                    "Brute-forcing admin passwords",
+                    "SQL Injection in search bars",
+                    "DDoS amplification traffic"
+                ],
+                correct: 0,
+                explanation: "Certificate Transparency requires CAs to log all issued X.509 certificates to public append-only cryptographic ledgers, allowing domain owners to detect rogue certificates immediately."
+            },
+            {
+                id: 60,
+                topicId: 2,
+                topicName: "Cryptography & PKI",
+                question: "In asymmetric encryption, if Alice wants to send a confidential message to Bob, which key must Alice use to encrypt the message?",
+                options: [
+                    "Alice's Private Key",
+                    "Alice's Public Key",
+                    "Bob's Public Key",
+                    "Bob's Private Key"
+                ],
+                correct: 2,
+                explanation: "To ensure confidentiality, Alice encrypts data using Bob's Public Key. Only Bob possesses the corresponding Private Key necessary to decrypt the message."
+            },
+
+            // ==========================================
+            // TOPIC 3: Web App Security & OWASP (30 Qs)
+            // ==========================================
+            {
+                id: 61,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "Which flaw occurs when untrusted user input is directly concatenated into a dynamic database query structure?",
+                options: [
+                    "Cross-Site Scripting (XSS)",
+                    "SQL Injection (SQLi)",
+                    "Cross-Site Request Forgery (CSRF)",
+                    "Insecure Deserialization"
+                ],
+                correct: 1,
+                explanation: "SQL Injection (SQLi) occurs when an application inserts unsanitized user input into database queries, allowing attackers to manipulate query logic, bypass logins, or extract database contents."
+            },
+            {
+                id: 62,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What is the most effective technical defense against SQL Injection vulnerabilities?",
+                options: [
+                    "Client-side JavaScript input validation",
+                    "Parameterized Queries (Prepared Statements) with bound variables",
+                    "Hashing all incoming HTTP POST payloads",
+                    "Encrypting web server hard drives"
+                ],
+                correct: 1,
+                explanation: "Prepared Statements (Parameterized Queries) force the database to treat user input strictly as data parameters rather than executable SQL code instructions, completely preventing SQLi."
+            },
+            {
+                id: 63,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "Which Cross-Site Scripting (XSS) variant involves malicious scripts stored permanently inside target database records?",
+                options: [
+                    "Reflected XSS",
+                    "DOM-based XSS",
+                    "Stored (Persistent) XSS",
+                    "Blind SQLi"
+                ],
+                correct: 2,
+                explanation: "Stored XSS occurs when malicious input is saved in a persistent datastore (e.g., comment section or user profile) and subsequently rendered into web pages served to other users."
+            },
+            {
+                id: 64,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What cookie attribute prevents client-side JavaScript (like `document.cookie`) from accessing session cookies?",
+                options: [
+                    "Secure flag",
+                    "HttpOnly flag",
+                    "SameSite=Strict",
+                    "Domain attribute"
+                ],
+                correct: 1,
+                explanation: "Setting the HttpOnly attribute on session cookies instructs web browsers to block client-side scripts from reading cookie values, mitigating session hijacking via XSS."
+            },
+            {
+                id: 65,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "How does a Cross-Site Request Forgery (CSRF) attack operate?",
+                options: [
+                    "It executes unauthorized state-changing commands on behalf of an authenticated user without their consent",
+                    "It steals the user's Wi-Fi WPA key",
+                    "It infects the client OS with ransomware",
+                    "It decrypts HTTPS traffic in transit"
+                ],
+                correct: 0,
+                explanation: "CSRF tricks a victim's browser into executing unwanted actions (e.g., changing passwords or transferring funds) on a trusted application where the victim is currently authenticated."
+            },
+            {
+                id: 66,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "Which HTTP header defense instructs browsers to restrict resource sources (scripts, styles, images) to trusted origins?",
+                options: [
+                    "X-Frame-Options",
+                    "Content-Security-Policy (CSP)",
+                    "Strict-Transport-Security (HSTS)",
+                    "X-Content-Type-Options"
+                ],
+                correct: 1,
+                explanation: "Content-Security-Policy (CSP) allows server administrators to declare approved dynamic resource origins, preventing unauthorized inline script executions and data exfiltration."
+            },
+            {
+                id: 67,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What web vulnerability occurs when an application fetches remote resources specified by user-supplied URLs without validation?",
+                options: [
+                    "Server-Side Request Forgery (SSRF)",
+                    "Cross-Origin Resource Sharing (CORS)",
+                    "Path Traversal",
+                    "Clickjacking"
+                ],
+                correct: 0,
+                explanation: "SSRF allows an attacker to manipulate a web application into making crafted HTTP requests to internal internal network services (like cloud metadata endpoints at 169.254.169.254)."
+            },
+            {
+                id: 68,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "Which vulnerability permits attackers to manipulate file path parameters (e.g. `../../../etc/passwd`) to access system files?",
+                options: [
+                    "Directory / Path Traversal",
+                    "Command Injection",
+                    "XML External Entity (XXE)",
+                    "Buffer Overflow"
+                ],
+                correct: 0,
+                explanation: "Directory Traversal (or Path Traversal) uses dot-dot-slash (`../`) sequences to escape the web root directory and view restricted files on the underlying server system."
+            },
+            {
+                id: 69,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What security control prevents Clickjacking attacks by forbidding a site from being embedded inside an `<iframe>`?",
+                options: [
+                    "X-Frame-Options: DENY (or CSP frame-ancestors)",
+                    "Access-Control-Allow-Origin: *",
+                    "Strict-Transport-Security",
+                    "Set-Cookie: SameSite=Lax"
+                ],
+                correct: 0,
+                explanation: "The `X-Frame-Options: DENY` response header tells the browser to block any attempt to render the page inside an `<iframe>`, neutralizing Clickjacking transparent overlays."
+            },
+            {
+                id: 70,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What vulnerability occurs when an XML parser processes untrusted XML input containing references to external entities?",
+                options: [
+                    "XML External Entity (XXE) Injection",
+                    "XPath Injection",
+                    "DOM Cloaking",
+                    "Local File Inclusion (LFI)"
+                ],
+                correct: 0,
+                explanation: "XXE occurs when weakly configured XML parsers evaluate external entity references inside XML documents, leading to internal file disclosure, SSRF, or denial of service."
+            },
+            {
+                id: 71,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "Which HTTP header enforces HTTPS connections and prevents SSL Strip downgrades?",
+                options: [
+                    "HTTP Strict Transport Security (HSTS)",
+                    "Content-Encoding: gzip",
+                    "X-XSS-Protection",
+                    "Cache-Control: no-store"
+                ],
+                correct: 0,
+                explanation: "HSTS (`Strict-Transport-Security`) forces compliant web browsers to communicate exclusively over secure HTTPS channels, refusing to drop down to unencrypted HTTP."
+            },
+            {
+                id: 72,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What is Broken Object Level Authorization (BOLA) / IDOR?",
+                options: [
+                    "Failing to check user access rights when access requests reference internal object IDs directly (e.g., `/api/user/1002`)",
+                    "Missing index HTML files in public directories",
+                    "SQL database service crashes",
+                    "Expired SSL certificates"
+                ],
+                correct: 0,
+                explanation: "BOLA (or Insecure Direct Object Reference) happens when an application exposes database record identifiers without verifying whether the requesting user is authorized to access that specific record."
+            },
+            {
+                id: 73,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "Which mitigation best protects web applications against automated CSRF attacks?",
+                options: [
+                    "Anti-CSRF Tokens (Unique per-session cryptographically random tokens) & SameSite cookie attributes",
+                    "Using CSS grid layouts",
+                    "Disabling client-side console logging",
+                    "Enabling HTTP Gzip compression"
+                ],
+                correct: 0,
+                explanation: "Anti-CSRF tokens require incoming state-changing requests to supply a secret, unpredictable token that external malicious sites cannot read or forge."
+            },
+            {
+                id: 74,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What type of attack involves injecting operating system commands through vulnerable application input parameters?",
+                options: [
+                    "Command Injection",
+                    "LDAP Injection",
+                    "HTML Injection",
+                    "Buffer Underflow"
+                ],
+                correct: 0,
+                explanation: "Command Injection allows attackers to execute arbitrary shell/system commands on the host operating system running the web application (e.g. appending `; cat /etc/passwd`)."
+            },
+            {
+                id: 75,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What is Cross-Origin Resource Sharing (CORS)?",
+                options: [
+                    "A browser mechanism that uses HTTP headers to grant a web app running at one origin access to selected resources from a different origin",
+                    "A router protocol for load balancing web traffic",
+                    "A method for encrypting JSON Web Tokens",
+                    "A database replication technique"
+                ],
+                correct: 0,
+                explanation: "CORS relaxes the default Same-Origin Policy (SOP) in browsers, letting web applications explicitly define which external domains are permitted to fetch their API endpoints."
+            },
+            {
+                id: 76,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What security risk is introduced by setting CORS header `Access-Control-Allow-Origin: *` alongside `Access-Control-Allow-Credentials: true`?",
+                options: [
+                    "Exposes sensitive user authenticated data to any malicious website origin",
+                    "Causes browser rendering crashes",
+                    "Disables WebSockets protocol",
+                    "Triggers database deadlocks"
+                ],
+                correct: 0,
+                explanation: "Allowing wildcard origins (`*`) while accepting credentials allows untrusted 3rd-party origins to execute authenticated cross-site requests and steal private user data."
+            },
+            {
+                id: 77,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What is a JWT (JSON Web Token) structural layout composed of?",
+                options: [
+                    "Header, Payload, and Signature separated by dots (`.`)",
+                    "XML Tags with RSA keys",
+                    "Binary Byte Stream",
+                    "Zip File archive"
+                ],
+                correct: 0,
+                explanation: "A JWT consists of three Base64URL-encoded components: `Header.Payload.Signature`, signed to guarantee token authenticity."
+            },
+            {
+                id: 78,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What flaw occurs when an application deserializes untrusted object streams into memory without validation?",
+                options: [
+                    "Insecure Deserialization leading to Remote Code Execution (RCE)",
+                    "Memory Leak in CSS engine",
+                    "HTML Parsing Exception",
+                    "Broken Image rendering"
+                ],
+                correct: 0,
+                explanation: "Insecure Deserialization allows attackers to inject malicious serialized object payloads that execute arbitrary code when instantiated by the application backend."
+            },
+            {
+                id: 79,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What practice prevents Sensitive Data Exposure in server log files?",
+                options: [
+                    "Data Sanitization / Redaction of Passwords, API Keys, and PII before writing to logs",
+                    "Encrypting monitor screens",
+                    "Deleting log files every minute",
+                    "Storing logs in HTML format"
+                ],
+                correct: 0,
+                explanation: "Log redaction strips out sensitive tokens, credentials, and personally identifiable information (PII) before storing entries in application logging pipelines."
+            },
+            {
+                id: 80,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "Which SameSite cookie attribute value ensures cookies are NEVER sent in cross-site requests (providing maximum CSRF protection)?",
+                options: [
+                    "SameSite=Strict",
+                    "SameSite=Lax",
+                    "SameSite=None",
+                    "SameSite=Disabled"
+                ],
+                correct: 0,
+                explanation: "Setting `SameSite=Strict` ensures browsers will not append the cookie to any cross-site request, even when following regular links from external sites."
+            },
+            {
+                id: 81,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What type of XSS attack executes entirely within the client-side browser DOM without server payload interaction?",
+                options: [
+                    "DOM-based XSS",
+                    "Stored XSS",
+                    "Blind XSS",
+                    "Reflected XSS"
+                ],
+                correct: 0,
+                explanation: "DOM-based XSS occurs when client-side JavaScript reads data from a user-controllable source (like `location.search`) and unsafely passes it to an execution sink (like `eval()` or `innerHTML`)."
+            },
+            {
+                id: 82,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What vulnerability allows an attacker to manipulate user session identifiers to hijack another user's session?",
+                options: [
+                    "Session Fixation / Session Hijacking",
+                    "Cache Poisoning",
+                    "Clickjacking",
+                    "Parameter Pollution"
+                ],
+                correct: 0,
+                explanation: "Session Fixation forces a known session ID onto a victim so that once the victim authenticates, the attacker can reuse the preset session key to gain access."
+            },
+            {
+                id: 83,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What is the recommended defense against Open Redirect vulnerabilities?",
+                options: [
+                    "Validating destination URLs against a strict whitelist of trusted relative paths or domain origins",
+                    "Encrypting the HTTP Host header",
+                    "Using JavaScript alert modals",
+                    "Disabling HTTP GET parameters"
+                ],
+                correct: 0,
+                explanation: "Open Redirects allow attackers to append arbitrary external URLs to redirect parameters. Applications should validate destination paths against an explicit whitelist of relative internal endpoints."
+            },
+            {
+                id: 84,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "Which mechanism prevents timing attacks during password hash verification?",
+                options: [
+                    "Constant-time string comparison algorithms",
+                    "MD5 hashing",
+                    "Adding randomized sleep delays",
+                    "Limiting string length to 8 characters"
+                ],
+                correct: 0,
+                explanation: "Constant-time string comparison ensures that character matching functions execute in identical time durations regardless of where matching fails, preventing side-channel timing leaks."
+            },
+            {
+                id: 85,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What OWASP project defines standard enterprise web application security requirements and controls?",
+                options: [
+                    "OWASP ASVS (Application Security Verification Standard)",
+                    "OWASP ZAP",
+                    "OWASP Dependency-Check",
+                    "OWASP Juice Shop"
+                ],
+                correct: 0,
+                explanation: "OWASP ASVS provides developers and security architects with a detailed list of functional security requirements for designing, building, and testing secure web applications."
+            },
+            {
+                id: 86,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What vulnerability occurs when an application exposes administrative interfaces or sensitive endpoints without proper authentication controls?",
+                options: [
+                    "Broken Access Control",
+                    "Cross-Site Scripting",
+                    "SQL Injection",
+                    "Cache Miss"
+                ],
+                correct: 0,
+                explanation: "Broken Access Control involves failures to enforce authorization rules, permitting unauthorized users to view administrative controls, alter data, or access unauthorized objects."
+            },
+            {
+                id: 87,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What defense protects APIs from credential stuffing and denial-of-service brute force attacks?",
+                options: [
+                    "Rate Limiting & Account Lockout Policies",
+                    "HTML Table layouts",
+                    "Gzip Compression",
+                    "JSON Schema Validation"
+                ],
+                correct: 0,
+                explanation: "Rate limiting restricts the number of requests a client IP or account can perform within a given time window, suppressing automated password guessing."
+            },
+            {
+                id: 88,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "Why should detailed stack traces and debugging errors be disabled in production web applications?",
+                options: [
+                    "Detailed error messages leak internal system paths, framework versions, and database schemas to attackers",
+                    "Stack traces slow down user Wi-Fi speed",
+                    "Errors corrupt browser cookies",
+                    "Stack traces break HTML validation standards"
+                ],
+                correct: 0,
+                explanation: "Uncontrolled error output provides attackers with critical reconnaissance information, revealing internal code implementation details and software versions."
+            },
+            {
+                id: 89,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What risk is addressed by Software Composition Analysis (SCA) tools?",
+                options: [
+                    "Vulnerable and Outdated Components / Open-Source Software Supply Chain Vulnerabilities",
+                    "Physical server hardware theft",
+                    "DNS cache timeouts",
+                    "Monitored screen brightness"
+                ],
+                correct: 0,
+                explanation: "SCA tools scan application dependencies (like npm or pip packages) for known CVE vulnerabilities and license risks in third-party libraries."
+            },
+            {
+                id: 90,
+                topicId: 3,
+                topicName: "Web Application Security & OWASP Top 10",
+                question: "What is Subresource Integrity (SRI)?",
+                options: [
+                    "A security feature that enables browsers to verify that resources fetched from CDNs (like scripts/styles) delivered without unauthorized manipulation using cryptographic hashes",
+                    "A firewall packet inspection rule",
+                    "An internal database index algorithm",
+                    "A domain registration lock service"
+                ],
+                correct: 0,
+                explanation: "SRI uses an `integrity` attribute containing cryptographic hashes on `<script>` tags, allowing browsers to verify that CDN-hosted files have not been tampered with."
+            }
+        ];
+
+        // --- APPLICATION ENGINE ENGINE CLASS ---
+        class QuizEngine {
+            constructor() {
+                this.activeQuestions = [];
+                this.currentIndex = 0;
+                this.userAnswers = {}; // questionId => selectedIndex
+                this.timerInterval = null;
+                this.timeRemaining = 0;
+                this.totalTimeAllocated = 0;
+                this.currentTopicId = 0; // 0 = Full Exam, 1-3 = Topics
+                this.STORAGE_KEY = 'janith_vc_cyber_exam_state';
+            }
+
+            init() {
+                lucide.createIcons();
+                this.checkSavedState();
+                this.showDashboard();
+
+                // Clean up timers when closing tab
+                window.addEventListener('beforeunload', () => {
+                    if (this.timeRemaining > 0 && Object.keys(this.userAnswers).length > 0) {
+                        this.saveState();
+                    }
+                });
+            }
+
+            checkSavedState() {
+                const saved = localStorage.getItem(this.STORAGE_KEY);
+                const btn = document.getElementById('btn-resume-quiz');
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        if (parsed && parsed.activeQuestions && parsed.activeQuestions.length > 0 && parsed.timeRemaining > 0) {
+                            if (btn) btn.classList.remove('hidden');
+                            return;
+                        }
+                    } catch(e) {}
+                }
+                if (btn) btn.classList.add('hidden');
+            }
+
+            saveState() {
+                const state = {
+                    activeQuestions: this.activeQuestions,
+                    currentIndex: this.currentIndex,
+                    userAnswers: this.userAnswers,
+                    timeRemaining: this.timeRemaining,
+                    totalTimeAllocated: this.totalTimeAllocated,
+                    currentTopicId: this.currentTopicId
+                };
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+                this.checkSavedState();
+            }
+
+            clearState() {
+                localStorage.removeItem(this.STORAGE_KEY);
+                this.checkSavedState();
+            }
+
+            resumeSavedQuiz() {
+                const saved = localStorage.getItem(this.STORAGE_KEY);
+                if (!saved) return;
+                try {
+                    const parsed = JSON.parse(saved);
+                    this.activeQuestions = parsed.activeQuestions;
+                    this.currentIndex = parsed.currentIndex || 0;
+                    this.userAnswers = parsed.userAnswers || {};
+                    this.timeRemaining = parsed.timeRemaining;
+                    this.totalTimeAllocated = parsed.totalTimeAllocated;
+                    this.currentTopicId = parsed.currentTopicId;
+
+                    document.getElementById('view-dashboard').classList.add('hidden');
+                    document.getElementById('view-results').classList.add('hidden');
+                    document.getElementById('view-quiz').classList.remove('hidden');
+
+                    if (this.currentTopicId === 0) {
+                        document.getElementById('quiz-topic-badge').textContent = "Comprehensive Exam";
+                        document.getElementById('quiz-topic-title').textContent = "Full 90-Question Master Cyber Security Test";
+                    } else {
+                        const topicObj = this.activeQuestions[0];
+                        document.getElementById('quiz-topic-badge').textContent = `Module ${this.currentTopicId}`;
+                        document.getElementById('quiz-topic-title').textContent = topicObj ? topicObj.topicName : "Module Quiz";
+                    }
+
+                    this.startTimer();
+                    this.renderQuestion();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } catch(e) {
+                    this.clearState();
+                }
+            }
+
+            showDashboard() {
+                this.stopTimer();
+                document.getElementById('view-dashboard').classList.remove('hidden');
+                document.getElementById('view-quiz').classList.add('hidden');
+                document.getElementById('view-results').classList.add('hidden');
+                this.checkSavedState();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            startQuiz(topicId) {
+                this.clearState();
+                this.currentTopicId = topicId;
+                const shouldShuffle = document.getElementById('chk-shuffle')?.checked;
+
+                if (topicId === 0) {
+                    this.activeQuestions = [...QUESTIONS_DB];
+                    document.getElementById('quiz-topic-badge').textContent = "Comprehensive Exam";
+                    document.getElementById('quiz-topic-title').textContent = "Full 90-Question Master Cyber Security Test";
+                    this.timeRemaining = 90 * 60; // 90 mins
+                } else {
+                    this.activeQuestions = QUESTIONS_DB.filter(q => q.topicId === topicId);
+                    const topicObj = this.activeQuestions[0];
+                    document.getElementById('quiz-topic-badge').textContent = `Module ${topicId}`;
+                    document.getElementById('quiz-topic-title').textContent = topicObj ? topicObj.topicName : "Module Quiz";
+                    this.timeRemaining = 30 * 60; // 30 mins
+                }
+
+                if (shouldShuffle) {
+                    this.activeQuestions.sort(() => Math.random() - 0.5);
+                }
+
+                this.totalTimeAllocated = this.timeRemaining;
+                this.currentIndex = 0;
+                this.userAnswers = {};
+
+                // UI Transition
+                document.getElementById('view-dashboard').classList.add('hidden');
+                document.getElementById('view-results').classList.add('hidden');
+                document.getElementById('view-quiz').classList.remove('hidden');
+
+                this.startTimer();
+                this.renderQuestion();
+                this.saveState();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            startTimer() {
+                this.stopTimer();
+                this.updateTimerDisplay();
+                this.timerInterval = setInterval(() => {
+                    this.timeRemaining--;
+                    this.updateTimerDisplay();
+                    if (this.timeRemaining % 5 === 0) {
+                        this.saveState();
+                    }
+                    if (this.timeRemaining <= 0) {
+                        this.stopTimer();
+                        alert("Time has expired! Submitting your examination answers automatically.");
+                        this.finishQuiz();
+                    }
+                }, 1000);
+            }
+
+            stopTimer() {
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
+            }
+
+            toggleQuestionGrid() {
+                const drawer = document.getElementById('question-palette-drawer');
+                drawer.classList.toggle('hidden');
+                if (!drawer.classList.contains('hidden')) {
+                    this.renderQuestionGrid();
+                }
+            }
+
+            renderQuestionGrid() {
+                const container = document.getElementById('question-grid-container');
+                container.innerHTML = '';
+                this.activeQuestions.forEach((q, idx) => {
+                    const isAnswered = this.userAnswers[q.id] !== undefined;
+                    const isCurrent = idx === this.currentIndex;
+                    const btn = document.createElement('button');
+                    btn.className = `w-8 h-8 rounded font-mono text-xs font-bold transition flex items-center justify-center ${
+                        isCurrent ? 'ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-900 ' : ''
+                    }${
+                        isAnswered ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                    }`;
+                    btn.textContent = idx + 1;
+                    btn.onclick = () => {
+                        this.currentIndex = idx;
+                        this.renderQuestion();
+                        document.getElementById('question-palette-drawer').classList.add('hidden');
+                    };
+                    container.appendChild(btn);
+                });
+            }
+
+            updateTimerDisplay() {
+                const minutes = Math.floor(Math.max(0, this.timeRemaining) / 60);
+                const seconds = Math.max(0, this.timeRemaining) % 60;
+                const formatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                const timerElem = document.getElementById('quiz-timer');
+                if (timerElem) timerElem.textContent = formatted;
+            }
+
+            renderQuestion() {
+                const q = this.activeQuestions[this.currentIndex];
+                const total = this.activeQuestions.length;
+
+                // Headers & Tag Updates
+                document.getElementById('question-number-tag').textContent = `Question ${this.currentIndex + 1} of ${total}`;
+                document.getElementById('question-category-tag').textContent = q.topicName;
+                document.getElementById('question-text').textContent = q.question;
+                document.getElementById('quiz-progress-text').textContent = `${this.currentIndex + 1} / ${total}`;
+
+                // Update Progress Bar
+                const percent = ((this.currentIndex + 1) / total) * 100;
+                document.getElementById('quiz-progress-bar').style.width = `${percent}%`;
+
+                // Render Options
+                const optionsContainer = document.getElementById('options-container');
+                optionsContainer.innerHTML = '';
+
+                const selectedAnswer = this.userAnswers[q.id];
+                const isAnswered = selectedAnswer !== undefined;
+
+                q.options.forEach((optText, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left p-4 rounded-xl font-medium text-sm border transition flex items-start space-x-3 text-slate-200 ";
+                    
+                    if (!isAnswered) {
+                        btn.className += "bg-slate-900/80 hover:bg-slate-800 border-slate-800 hover:border-slate-700 cursor-pointer";
+                    } else {
+                        btn.disabled = true;
+                        if (index === q.correct) {
+                            // Correct Option
+                            btn.className += "bg-emerald-950/60 border-emerald-500 text-emerald-200 font-bold";
+                        } else if (index === selectedAnswer && selectedAnswer !== q.correct) {
+                            // Selected Wrong Option
+                            btn.className += "bg-rose-950/60 border-rose-500 text-rose-200";
+                        } else {
+                            btn.className += "bg-slate-900/40 border-slate-900 opacity-50";
+                        }
+                    }
+
+                    // Option Marker (A, B, C, D)
+                    const letter = String.fromCharCode(65 + index);
+                    let markerBg = "bg-slate-800 text-slate-400 border-slate-700";
+                    if (isAnswered) {
+                        if (index === q.correct) markerBg = "bg-emerald-500 text-slate-950 font-bold border-emerald-400";
+                        else if (index === selectedAnswer) markerBg = "bg-rose-500 text-white font-bold border-rose-400";
+                    }
+
+                    btn.innerHTML = `
+                        <span class="w-6 h-6 rounded-md flex items-center justify-center border text-xs font-mono shrink-0 ${markerBg}">${letter}</span>
+                        <span class="pt-0.5 leading-snug flex-1">${optText}</span>
+                    `;
+
+                    btn.onclick = () => this.selectOption(index);
+                    optionsContainer.appendChild(btn);
+                });
+
+                // Render Explanation Box
+                const expBox = document.getElementById('explanation-box');
+                const expStatus = document.getElementById('explanation-status');
+                const expText = document.getElementById('explanation-text');
+                const expIcon = document.getElementById('explanation-icon');
+
+                if (isAnswered) {
+                    expBox.classList.remove('hidden');
+                    expText.textContent = q.explanation;
+
+                    if (selectedAnswer === q.correct) {
+                        expBox.className = "rounded-xl p-5 border transition-all duration-300 bg-emerald-950/30 border-emerald-500/40 text-emerald-300";
+                        expStatus.textContent = "Correct Answer! - Reason / Explanation:";
+                        expIcon.className = "p-2 rounded-lg shrink-0 mt-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                        expIcon.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5"></i>`;
+                    } else {
+                        expBox.className = "rounded-xl p-5 border transition-all duration-300 bg-rose-950/30 border-rose-500/40 text-rose-300";
+                        expStatus.textContent = `Incorrect. Correct Choice: Option ${String.fromCharCode(65 + q.correct)} - Reason / Explanation:`;
+                        expIcon.className = "p-2 rounded-lg shrink-0 mt-0.5 bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                        expIcon.innerHTML = `<i data-lucide="x-circle" class="w-5 h-5"></i>`;
+                    }
+                    lucide.createIcons();
+                } else {
+                    expBox.classList.add('hidden');
+                }
+
+                // Nav Buttons
+                document.getElementById('btn-prev').disabled = (this.currentIndex === 0);
+                
+                if (this.currentIndex === total - 1) {
+                    document.getElementById('btn-next').classList.add('hidden');
+                    document.getElementById('btn-submit-exam').classList.remove('hidden');
+                } else {
+                    document.getElementById('btn-next').classList.remove('hidden');
+                    document.getElementById('btn-submit-exam').classList.add('hidden');
+                }
+
+                lucide.createIcons();
+            }
+
+            selectOption(optionIndex) {
+                const q = this.activeQuestions[this.currentIndex];
+                if (this.userAnswers[q.id] !== undefined) return; // already answered
+
+                this.userAnswers[q.id] = optionIndex;
+                this.saveState();
+                this.renderQuestion();
+            }
+
+            finishQuiz() {
+                this.stopTimer();
+
+                // Compute Metrics
+                let correctCount = 0;
+                this.activeQuestions.forEach(q => {
+                    if (this.userAnswers[q.id] === q.correct) {
+                        correctCount++;
+                    }
+                });
+
+                const total = this.activeQuestions.length;
+                const percentage = Math.round((correctCount / total) * 100);
+                const timeSpentSeconds = this.totalTimeAllocated - this.timeRemaining;
+                const spentMinutes = Math.floor(Math.max(0, timeSpentSeconds) / 60);
+                const spentSecs = Math.max(0, timeSpentSeconds) % 60;
+                const formattedTime = `${String(spentMinutes).padStart(2, '0')}:${String(spentSecs).padStart(2, '0')}`;
+
+                // Update UI Results
+                document.getElementById('results-percentage').textContent = `${percentage}%`;
+                document.getElementById('results-score-text').textContent = `${correctCount} / ${total}`;
+                document.getElementById('results-accuracy-text').textContent = `${percentage}%`;
+                document.getElementById('results-time-text').textContent = formattedTime;
+
+                const statusBadge = document.getElementById('results-status-badge');
+                const gradeBadge = document.getElementById('results-grade');
+                const feedbackText = document.getElementById('results-feedback');
+
+                if (percentage >= 70) {
+                    statusBadge.textContent = "PASSED";
+                    statusBadge.className = "text-lg font-bold text-emerald-400 font-mono";
+                    gradeBadge.textContent = percentage >= 90 ? "GRADE A+" : (percentage >= 80 ? "GRADE A" : "GRADE B");
+                    feedbackText.textContent = `Excellent job! You have demonstrated strong mastery over the Cyber Security concepts reviewed by Instructor JANITH VC.`;
+                } else {
+                    statusBadge.textContent = "FAILED";
+                    statusBadge.className = "text-lg font-bold text-rose-400 font-mono";
+                    gradeBadge.textContent = "GRADE F";
+                    feedbackText.textContent = `Score is below the 70% passing threshold. Please review the detailed explanations below and retake the module.`;
+                }
+
+                // Clear persistent state on successful submission
+                this.clearState();
+
+                // Show Results View
+                document.getElementById('view-quiz').classList.add('hidden');
+                document.getElementById('view-results').classList.remove('hidden');
+
+                // Render Review Cards
+                this.renderReviewCards('all');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            filterReview(filterType) {
+                // Style Active Buttons
+                ['all', 'incorrect', 'correct'].forEach(f => {
+                    const btn = document.getElementById(`btn-filter-${f}`);
+                    if (f === filterType) {
+                        btn.className = "px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-bold transition";
+                    } else {
+                        btn.className = "px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition";
+                    }
+                });
+
+                this.renderReviewCards(filterType);
+            }
+
+            renderReviewCards(filterType) {
+                const container = document.getElementById('review-cards-container');
+                container.innerHTML = '';
+
+                let filtered = this.activeQuestions;
+                if (filterType === 'incorrect') {
+                    filtered = this.activeQuestions.filter(q => this.userAnswers[q.id] !== q.correct);
+                } else if (filterType === 'correct') {
+                    filtered = this.activeQuestions.filter(q => this.userAnswers[q.id] === q.correct);
+                }
+
+                if (filtered.length === 0) {
+                    container.innerHTML = `
+                        <div class="glass-card rounded-xl p-8 text-center text-slate-400">
+                            <i data-lucide="info" class="w-8 h-8 mx-auto mb-2 text-slate-500"></i>
+                            <p>No questions matched the selected filter criteria.</p>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                    return;
+                }
+
+                filtered.forEach((q, idx) => {
+                    const selected = this.userAnswers[q.id];
+                    const isCorrect = (selected === q.correct);
+                    const userSelectedText = selected !== undefined ? q.options[selected] : "Not Answered";
+                    const correctText = q.options[q.correct];
+
+                    const card = document.createElement('div');
+                    card.className = `glass-card rounded-xl p-6 border ${isCorrect ? 'border-emerald-500/20' : 'border-rose-500/20'} space-y-4`;
+
+                    card.innerHTML = `
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="space-y-1">
+                                <span class="text-xs font-mono text-slate-400">${q.topicName} &bull; Question ${idx + 1}</span>
+                                <h4 class="text-base font-semibold text-white">${q.question}</h4>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-full text-xs font-mono font-bold shrink-0 ${isCorrect ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'}">
+                                ${isCorrect ? 'Correct' : 'Incorrect'}
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+                            <div class="p-3 rounded-lg ${isCorrect ? 'bg-emerald-950/30 border border-emerald-500/30 text-emerald-300' : 'bg-rose-950/30 border border-rose-500/30 text-rose-300'}">
+                                <span class="text-slate-400 block font-sans mb-1">Your Selected Option:</span>
+                                <strong>${selected !== undefined ? String.fromCharCode(65 + selected) + ') ' : ''}${userSelectedText}</strong>
+                            </div>
+                            <div class="p-3 rounded-lg bg-emerald-950/30 border border-emerald-500/30 text-emerald-300">
+                                <span class="text-slate-400 block font-sans mb-1">Correct Answer:</span>
+                                <strong>${String.fromCharCode(65 + q.correct)}) ${correctText}</strong>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-lg bg-slate-900/80 border border-slate-800 text-xs text-slate-300 leading-relaxed">
+                            <strong class="text-cyan-400 font-mono block mb-1">Reason / Explanation:</strong>
+                            ${q.explanation}
+                        </div>
+                    `;
+
+                    container.appendChild(card);
+                });
+
+                lucide.createIcons();
+            }
+
+            scrollToReview() {
+                const section = document.getElementById('review-section');
+                if (section) {
+                    section.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        }
+
+        // Initialize Global Engine instance
+        let app;
+        window.onload = function() {
+            app = new QuizEngine();
+            app.init();
+        }
+    </script>
+</body>
+</html>
